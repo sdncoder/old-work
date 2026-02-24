@@ -1,0 +1,76 @@
+# SPF A Side
+library(igraph)
+graph <- list(j = c("d", "l", "t"),
+              l = c("j", "d", "t", "h"),
+              d = c("j", "l", "t", "c"),
+              t = c("j", "l", "a", "d"),
+              a = c("t", "h", "c"),
+              h = c("l", "a", "g"),
+              c = c("d", "a", "g", "y"),
+              g = c("c", "h", "m", "y", "r"),
+              m = c("g", "y"),
+              y = c("m", "g", "c", "r", "s"),
+              r = c("y", "g", "s"),
+              s = c("r", "y"))
+
+weights <- list(j = c(1, 1, 1),
+                l = c(1, 1, 1, 1),
+                d = c(1, 1, 1, 1),
+                t = c(1, 1, 1, 1),
+                a = c(1, 1, 1),
+                h = c(2, 1, 1),
+                c = c(1, 1, 1, 1),
+                g = c(1, 1, 1, 1, 1),
+                m = c(1, 1),
+                y = c(1, 1, 1, 1, 1),
+                r = c(1, 1, 1),
+                s = c(1, 1))
+
+# create edgelist with weights
+G <- data.frame(stack(graph), weights = stack(weights)[[1]])
+set.seed(500)
+el <- as.matrix(stack(graph))
+g <- graph_from_edgelist(el)
+oldpar <- par(mar = c(1, 1, 1, 1))
+plot(g, edge.label = stack(weights)[[1]], edge.arrow.size = 0.7, vertex.color = "orange", edge.width = 1)
+par(oldpar)
+
+
+path_length <- function(path) {
+  # if path is NULL return infinite length
+  if (is.null(path)) return(Inf)
+  
+  # get all consecutive nodes
+  pairs <- cbind(values = path[-length(path)], ind = path[-1])
+  # join with G and sum over weights
+  sum(merge(pairs, G)[ , "weights"])
+}
+
+find_shortest_path <- function(graph, start, end, path = c()) {
+  # if there are no nodes linked from current node (= dead end) return NULL
+  if (is.null(graph[[start]])) return(NULL)
+  # add next node to path so far
+  path <- c(path, start)
+  
+  # base case of recursion: if end is reached return path
+  if (start == end) return(path)
+  
+  # initialize shortest path as NULL
+  shortest <- NULL
+  # loop through all nodes linked from the current node (given in start)
+  for (node in graph[[start]]) {
+    # proceed only if linked node is not already in path
+    if (!(node %in% path)) {
+      # recursively call function for finding shortest path with node as start and assign it to newpath
+      newpath <- find_shortest_path(graph, node, end, path)
+      # if newpath is shorter than shortest so far assign newpath to shortest
+      if (path_length(newpath) < path_length(shortest))
+        shortest <- newpath
+    }
+  }
+  # return shortest path
+  shortest
+}
+
+
+
