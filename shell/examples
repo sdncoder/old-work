@@ -1,0 +1,37 @@
+set tdate [clock format [clock seconds] -format %Y%m%d]
+
+#set host 192.168.255.100
+set user mktbk\r
+set pass password\r
+
+
+foreach {host} {argv0} {
+
+
+# This command tells expect not to echo the output to the console.
+exp_log_user 0
+
+
+set tdate [clock format [clock seconds] -format %Y%m%d]
+
+set name $tdate-$host
+spawn telnet $host
+
+expect "Login: "
+exp_send $user
+
+expect "Password: "
+exp_send $pass
+
+expect "> "
+exp_send "export\r"
+
+expect "> "
+exp_send "quit\r"
+expect eof
+
+set fd [ open $name w ]
+puts $fd $expect_out(buffer)
+close $fd
+
+}

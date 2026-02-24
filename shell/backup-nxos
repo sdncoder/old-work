@@ -1,0 +1,38 @@
+#!/usr/bin/expect -f
+# TCL/EXPECT script to SCP startup-config from Nexus IOS-XE to local server
+# Use this for new data center IOS-Xe deployments that are not integrated into IAM, backup, logging systems
+# Need to ensure data center build configuration changes are documented from start of build
+set timeout 15
+
+# run from linux command line
+# arguemnts are local router login creds and sso creds of linux server
+#
+# .\usj-backup3.sh usjuser usjpass uosso uopass
+#
+set usjuser [lindex $argv 0]    ;# local creds on router
+set usjpass [lindex $argv 1]    ;# local creds on router
+set uosso [lindex $argv 2]      ;# SSO creds, this is for the linux destination server
+set uopass [lindex $argv 3]     ;# SSO creds
+
+# IP list of Nexus routers for backup is nexus.txt
+# read in IP of routers for SCP until EOF
+set f [open "/root/hosts/nexus.txt"]
+set host [split [read $f] "\n"]
+close $f
+
+
+# loop through Nexus hosts file, SCP and copy startup-config to linux server
+foreach host $host {
+ spawn ssh -o StrictHostKeyChecking=no $usjuser@$host
+ expect "Password: "
+ send "$usjpass\r"
+ expect "# "
+ send "copy startup-config scp://<path_to_server> vrf management\n"
+ expect "Enter username: "
+ send "$uosso\r"
+ expect "Password: "
+ send "$uopass\r"
+ expect "# "
+ send "exit\n"
+ expect eof
+}
