@@ -1,0 +1,4 @@
+   - name: copy output to file
+      copy:
+        content: "{{ output.stdout[0] }}
+        dest: "output-{{ inventory_hostname }}.txt"

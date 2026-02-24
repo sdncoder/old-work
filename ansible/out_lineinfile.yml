@@ -1,0 +1,13 @@
+---
+- name: file building
+  hosts: localhost
+  tasks:
+  - name: list directory
+    ansible.builtin.shell:                      # use shell commands
+      cmd: ls -l                                # commands
+    register: list                              # set output to register
+  - name: append to file
+    ansible.builtin.lineinfile:                 # use file commands
+      path: /home/netadmin/playbooks/text.txt   # path of destination file
+      line: "{{ list.stdout_lines }}"           # register value to file
+  - debug: var=list.stdout_lines                # output to stdout

@@ -1,0 +1,20 @@
+---
+- hosts: ios
+  gather_facts: no
+
+  tasks:
+  - name: show ip int brief
+    ios_command:
+      commands:
+        - show ip int brief
+        - show ip arp
+    # create variable from output of task ip_int
+    register: ip_int
+
+# send output of IOS command to file
+  - name: save to file
+    copy:
+      content: "{{ ip_int.stdout_lines }}"
+      dest: /etc/ansible/file.txt
+    # print executed output, send ip_int varible to standard output
+  - debug: var=ip_int.stdout_lines

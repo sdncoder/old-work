@@ -1,0 +1,37 @@
+---
+# Ansible-Playbook for stand-alone NGFW
+# Use this on our lab build, you will need to add Panorama groups for prod deploy
+
+- name: Add static NAT rule
+  hosts: localhost
+  connection: local
+
+# Palo Alto library
+  collections:
+    - paloaltonetworks.panos
+
+# ansible-playbook basic_nat_build.yml --extra-vars "username=<username> password=<password>"
+  vars:
+      username: "{{ username }}"
+      password: "{{ password }}"
+
+# variable load file with zone and IP info for 1:1 NAT
+  vars_files:
+    - "./palo_nat_vars.yml"
+
+  tasks:
+    - name: Create a static NAT rule
+      panos_nat_rule:
+        provider:
+          ip_address: "<stand-alone_Palo_MGT_IP>"
+          username: "{{ username }}"
+          password: "{{ password }}"
+        rule_name: "{{ rule_name }}"
+        source_zone: ["{{ source_zone }}"]
+        destination_zone: "{{ destination_zone }}"
+        source_ip: ["{{ source_ip }}"]
+        destination_ip: ["{{ destination_ip }}"]
+        service: "any"
+        snat_type: "static-ip"
+        snat_bidirectional: "true"
+        state: "present"

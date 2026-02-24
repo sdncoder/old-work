@@ -1,0 +1,21 @@
+---
+- hosts: mroute_hosts
+  gather_facts: no
+  vars:
+    ansible_user: "{{ sso }}"
+    ansible_password: "{{ pass }}"
+
+  tasks:
+  - name: show mroute hosts and export to file for TextFSM
+    iosxr_command:
+      commands:
+        - show ip mroute
+    # create variable from output of task mroute
+    register: mroute
+
+  - name: save to file
+    copy:
+      content: "{{ mroute.stdout_lines }}"
+      dest:  /etc/ansible/den-lab/cli_parse/show_mroute.txt
+    # print executed output, send mroute varible to standard output
+  - debug: var=mroute.stdout_lines

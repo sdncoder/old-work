@@ -1,0 +1,34 @@
+---
+# Ansible-Playbook - loop to create address objects
+
+- name: Add address object
+  hosts: localhost
+  connection: local
+
+# Palo Alto library
+  collections:
+    - paloaltonetworks.panos
+
+# ansible-playbook
+  vars:
+      username: "{{ username }}"
+      password: "{{ password }}"
+
+      obj_var:
+      - name: obj20
+        value: 20.20.20.1/24
+      - name: obj21
+        value: 21.21.21.1/24
+      - name: obj22
+        value: 22.22.22.1/24
+
+  tasks:
+    - name: Create address object
+      panos_address_object:
+        provider:
+          ip_address: "172.16.1.130"
+          username: "{{ username }}"
+          password: "{{ password }}"
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+      loop: "{{ obj_var }}"

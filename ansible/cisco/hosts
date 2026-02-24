@@ -1,0 +1,10 @@
+
+[ios]
+192.168.1.13 ansible_host=192.168.1.13 
+
+
+[ios:vars]
+ansible_ssh_pass=<...>  # better to --extra-vars from cli
+ansible_user=<...>      # better to --extra-vars from cli
+ansible_network_os=ios
+ansible_connection=network_cli

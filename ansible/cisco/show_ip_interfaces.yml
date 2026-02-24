@@ -1,0 +1,14 @@
+---
+-- playbook to send ip interface to standard linux output
+- hosts: ios
+  gather_facts: no
+
+  tasks:
+  - name: show ip int brief
+    ios_command:
+      commands:
+        - show ip int brief
+    register: ip_int
+
+  - debug: var=ip_int.stdout_lines
+

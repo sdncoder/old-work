@@ -1,0 +1,12 @@
+---
+- hosts: ios
+  gather_facts: no
+  tasks:
+   - name: config interface
+     ios_config:
+     # ordered set of commands using lines parameter
+       lines:
+       - description ansible-interface
+       - ip address 10.10.10.10 255.255.255.0
+       # set of commands against this interface (parent)
+       parents: interface GigabitEthernet3
