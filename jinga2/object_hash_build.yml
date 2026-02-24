@@ -1,0 +1,19 @@
+---
+ - hosts: 127.0.0.1 # localhost
+
+   vars:
+     address_objects:
+       - name: ansible2
+         value: 2.2.2.1/32
+       - name: ansible3
+         value: 3.3.3.1/32
+       - name: ansible4
+         value: 4.4.4.1/32
+       - name: ansible5
+         value: 5.5.5.1/32
+# variables in vars are used by jinga2 template
+   tasks:
+    - name: jinga2 address_objects build
+      template:
+        src: /etc/ansible/ansible_objects_play.j2
+        dest: /etc/ansible/configs/objects_playbook.yml
